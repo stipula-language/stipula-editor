@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/stipula-editor/static/css/main.2d2ee13b.css",
+    "main.js": "/stipula-editor/static/js/main.fb2b79e5.js",
+    "index.html": "/stipula-editor/index.html",
+    "main.2d2ee13b.css.map": "/stipula-editor/static/css/main.2d2ee13b.css.map",
+    "main.fb2b79e5.js.map": "/stipula-editor/static/js/main.fb2b79e5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2d2ee13b.css",
+    "static/js/main.fb2b79e5.js"
+  ]
+}
