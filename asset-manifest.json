@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/stipula-editor/static/css/main.b7556043.css",
-    "main.js": "/stipula-editor/static/js/main.4664a50f.js",
+    "main.css": "/stipula-editor/static/css/main.c26d7b85.css",
+    "main.js": "/stipula-editor/static/js/main.d86744a4.js",
     "index.html": "/stipula-editor/index.html",
-    "main.b7556043.css.map": "/stipula-editor/static/css/main.b7556043.css.map",
-    "main.4664a50f.js.map": "/stipula-editor/static/js/main.4664a50f.js.map"
+    "main.c26d7b85.css.map": "/stipula-editor/static/css/main.c26d7b85.css.map",
+    "main.d86744a4.js.map": "/stipula-editor/static/js/main.d86744a4.js.map"
   },
   "entrypoints": [
-    "static/css/main.b7556043.css",
-    "static/js/main.4664a50f.js"
+    "static/css/main.c26d7b85.css",
+    "static/js/main.d86744a4.js"
   ]
 }
