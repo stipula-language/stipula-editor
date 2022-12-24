@@ -22,6 +22,7 @@ function Agreement(props) {
     });
 
     e.preventDefault();
+    setInputParty("");
   }
   function handleAddFieldAuth(e) {
     props.setAgreement({
@@ -44,7 +45,6 @@ function Agreement(props) {
       ...props.agreement,
       fieldsParties: [...props.agreement.fieldsParties, inputFP],
     });
-
     e.preventDefault();
   }
   return (
@@ -97,6 +97,8 @@ function Agreement(props) {
             onChange={(e) => {
               setInputParty(e.target.value);
             }}
+            pattern="^[a-zA-Z][a-zA-Z0-9]{0,19}$"
+            required
           />
           <input type="submit" value=" " />
         </form>
@@ -115,6 +117,9 @@ function Agreement(props) {
               setInputFA(e.target.value);
             }}
           >
+            <option value="none" selected disabled hidden>
+              Select...
+            </option>
             {props.fields.map((element) => {
               return <option value={element}>{element}</option>;
             })}
@@ -136,6 +141,9 @@ function Agreement(props) {
               setInputFDS(e.target.value);
             }}
           >
+            <option value="none" selected disabled hidden>
+              Select...
+            </option>
             {props.fields.map((element) => {
               return <option value={element}>{element}</option>;
             })}
@@ -158,6 +166,9 @@ function Agreement(props) {
               setInputFP(e.target.value);
             }}
           >
+            <option value="none" selected disabled hidden>
+              Select...
+            </option>
             {props.fields.map((element) => {
               return <option value={element}>{element}</option>;
             })}

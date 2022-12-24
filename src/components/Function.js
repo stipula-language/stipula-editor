@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { v4 as uuid } from "uuid";
-import { Contract, Action } from "./Contract";
+import ActionView, { ActionsList } from "./ActionView";
 
 function Function(props) {
-  const [inputFA, setInputFA] = useState("");
+  const [inputField, setInputField] = useState("");
   const [inputAsset, setInputAsset] = useState("");
-  function handleChange() {}
+  const [conditions, setConditions] = useState(props.fun.conditions);
   function handleChangeActions(element) {
     props.setFunction({ ...props.fun, actions: element });
     console.log(props.fun);
@@ -22,9 +22,14 @@ function Function(props) {
   function setCaller(element) {
     props.setFunction({ ...props.fun, caller: element });
   }
-  function handleAddField(element) {}
-  function handleAddFA() {
-    props.setFunction({ ...props.fun, fields: inputFA });
+  function handleAddField(e) {
+    console.log(inputField);
+    props.setFunction({
+      ...props.fun,
+      fields: [...props.fun.fields, inputField],
+    });
+    setInputField("");
+    e.preventDefault();
   }
   function handleAddAsset(e) {
     console.log(inputAsset);
@@ -32,8 +37,18 @@ function Function(props) {
       ...props.fun,
       assets: [...props.fun.assets, inputAsset],
     });
+    setInputAsset("");
     e.preventDefault();
   }
+  function setCondition(cond, i) {
+    let tmp = conditions.slice();
+    tmp[i] = cond;
+    setConditions(tmp);
+  }
+  useEffect(() => {
+    console.log(conditions);
+    props.setFunction({ ...props.fun, conditions: conditions });
+  }, [conditions]);
   return (
     <div className="grid-container-function">
       <div className="title">Function</div>
@@ -77,6 +92,9 @@ function Function(props) {
             setCaller(e.target.value);
           }}
         >
+          <option value="none" selected disabled hidden>
+            Select...
+          </option>
           {props.parties.map((element) => {
             return <option value={element}>{element}</option>;
           })}
@@ -90,15 +108,13 @@ function Function(props) {
           })}
         </ul>
         <form onSubmit={handleAddField}>
-          <select
+          <input
+            type="text"
+            value={inputField}
             onChange={(e) => {
-              setInputFA(e.target.value);
+              setInputField(e.target.value);
             }}
-          >
-            {props.fields.map((element) => {
-              return <option value={element}>{element}</option>;
-            })}
-          </select>
+          />
           <input type="submit" value=" " />
         </form>
       </div>
@@ -111,21 +127,87 @@ function Function(props) {
           })}
         </ul>
         <form onSubmit={handleAddAsset}>
-          <select
+          <input
+            type="text"
+            value={inputAsset}
             onChange={(e) => {
               setInputAsset(e.target.value);
             }}
-          >
-            {props.assets.map((element) => {
-              return <option value={element}>{element}</option>;
-            })}
-          </select>
+          />
           <input type="submit" value=" " />
         </form>
       </div>
+      <div className="grid-f-conditions">
+        <ul>
+          <label>Necessary conditions for executing actions:</label>
+          {props.fun.conditions.map((cond, i) => {
+            return (
+              <li>
+                <input
+                  type="text"
+                  onChange={(e) => {
+                    setCondition({ ...cond, par1: e.target.value }, i);
+                  }}
+                  value={cond.par1}
+                />
+                <select
+                  onChange={(e) => {
+                    setCondition({ ...cond, par2: e.target.value }, i);
+                  }}
+                  value={cond.par2}
+                >
+                  <option value="" selected disabled hidden>
+                    Select...
+                  </option>
+                  <option value="=">equal</option>
+                  <option value="<">smaller</option>
+                  <option value="<=">smaller or equal</option>
+                  <option value=">=">greater or equal</option>
+                  <option value=">">greater</option>
+                  <option value="!=">different</option>
+                </select>
+                <input
+                  type="text"
+                  onChange={(e) => {
+                    setCondition({ ...cond, par3: e.target.value }, i);
+                  }}
+                  value={cond.par3}
+                />
+                <select
+                  onChange={(e) => {
+                    console.log(conditions);
+                    if (e.target.value == "") {
+                      console.log(1);
+                      let tmp = conditions.slice(0, i);
+                      tmp[i] = { ...cond, par4: e.target.value };
+                      setConditions(tmp);
+                    } else if (conditions.length <= i + 1) {
+                      console.log(i, conditions.length);
+                      let tmp = conditions.slice();
+                      tmp[i] = { ...cond, par4: e.target.value };
+                      tmp = tmp.concat({
+                        par1: "",
+                        par2: "",
+                        par3: "",
+                        par4: "",
+                      });
+                      setConditions(tmp);
+                    } else setCondition({ ...cond, par4: e.target.value }, i);
+                  }}
+                  value={cond.par4}
+                >
+                  <option value="" selected></option>
+                  <option value="&">and</option>
+                  <option value="|">or</option>
+                </select>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
       <div className="grid-f-actions">
         <ul>
-          <ActionView
+          <ActionsList
             actions={props.fun.actions}
             setActions={handleChangeActions}
           />
@@ -134,201 +216,5 @@ function Function(props) {
     </div>
   );
 }
-function ActionView(props) {
-  function setThen(element, elId) {
-    let index = props.actions.findIndex((item) => item.id === elId);
-    let tmp = props.actions.slice();
-    tmp.splice(index, 1, { ...props.actions[index], ifThen: element });
-    props.setActions(tmp);
-  }
-  return (
-    <div className="action-view">
-      <AddButton
-        previous=""
-        setActions={props.setActions}
-        actions={props.actions}
-      />
-      {props.actions.map((element) => {
-        return (
-          <div>
-            <li className="action">
-              {(() => {
-                switch (element.type) {
-                  case "SEND1":
-                    return (
-                      <div>
-                        <label>Send:</label>
-                        <input type="text" />
-                        <label>to:</label>
-                        <input type="text" />
-                      </div>
-                    );
-                  case "SEND2":
-                    return (
-                      <div>
-                        <label>Send:</label>
-                        <input type="text" />
-                        <select>
-                          <option value="+">+</option>
-                          <option value="-">-</option>
-                          <option value="×">×</option>
-                          <option value="÷">÷</option>
-                        </select>
-                        <input type="text" />
-                        <label>to:</label>
-                        <input type="text" />
-                      </div>
-                    );
-                  case "MOVE1":
-                    return (
-                      <div>
-                        <label>Move:</label>
-                        <input type="text" />
-                        <label>to:</label>
-                        <input type="text" />
-                      </div>
-                    );
-                  case "MOVE2":
-                    return (
-                      <div>
-                        <label>Move</label>
-                        <input type="text" />
-                        <label>of</label>
-                        <input type="text" />
-                        <label>to:</label>
-                        <input type="text" />
-                      </div>
-                    );
-                  case "IF":
-                    return (
-                      <div>
-                        <label>If:</label>
-                        <input type="text" />
-                        <select>
-                          <option value="=" />
-                        </select>
-                        <input type="text" />
-                        <label>then:</label>
-                        <ActionView
-                          actions={element.ifThen}
-                          setActions={(el) => setThen(el, element.id)}
-                        />
-                      </div>
-                    );
-                  case "WHEN1":
-                    return (
-                      <div>
-                        <label>After</label>
-                        <input type="text" />
-                        <select>
-                          <option>days</option>
-                          <option>weeks</option>
-                          <option>months</option>
-                          <option>years</option>
-                        </select>
-                        <label>then:</label>
-                        <ActionView
-                          actions={element.ifThen}
-                          setActions={(el) => setThen(el, element.id)}
-                        />
-                      </div>
-                    );
-                  case "WHEN2":
-                    return (
-                      <div>
-                        <label>At</label>
-                        <input type="date" />
-                        <select>
-                          <option>days</option>
-                          <option>weeks</option>
-                          <option>months</option>
-                          <option>years</option>
-                        </select>
-                        <label>then:</label>
-                        <ActionView
-                          actions={element.ifThen}
-                          setActions={(el) => setThen(el, element.id)}
-                        />
-                      </div>
-                    );
-                  default:
-                    return <>Error</>;
-                }
-              })()}
-            </li>
-            <AddButton
-              previous={element.id}
-              setActions={props.setActions}
-              actions={props.actions}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-function AddButton(props) {
-  const [show, setShow] = useState(false);
-  let menuRef = useRef();
 
-  //Close menu on click
-  useEffect(() => {
-    let handler = (e) => {
-      if (!menuRef.current.contains(e.target)) {
-        setShow(false);
-        console.log(menuRef.current);
-      }
-    };
-
-    document.addEventListener("mousedown", handler);
-
-    return () => {
-      document.removeEventListener("mousedown", handler);
-    };
-  });
-
-  function DropdownItem(props) {
-    function addAction(type) {
-      setShow(false);
-      if (props.previous != "") {
-        let tmp = props.actions.slice();
-        let index = tmp.findIndex((item) => item.id === props.previous);
-        tmp.splice(index + 1, 0, new Action(type, uuid()));
-        props.setActions(tmp);
-      } else {
-        console.log(props.previous);
-        props.setActions([new Action(type, uuid())]);
-      }
-    }
-    return (
-      <li>
-        <a onClick={() => addAction(props.type)}> {props.text} </a>
-      </li>
-    );
-  }
-  return (
-    <li ref={menuRef}>
-      <div
-        className="menu-trigger"
-        value="add"
-        onClick={() => {
-          setShow(!show);
-        }}
-      />
-      <div className={`dropdown ${show ? "active" : "inactive"}`}>
-        <DropdownItem text="Send x to y" type="SEND1" {...props} />
-        <DropdownItem text="Send x (+-×÷) z to y" type="SEND2" {...props} />
-        <DropdownItem text="Move x to y" type="MOVE1" {...props} />
-        <DropdownItem text="Move a part of x to y" type="MOVE2" {...props} />
-        <DropdownItem text="If something happen then..." type="IF" {...props} />
-        <DropdownItem text="After x time then..." type="WHEN1" {...props} />
-        <DropdownItem
-          text="At a certain date then..."
-          type="WHEN2"
-          {...props}
-        />
-      </div>
-    </li>
-  );
-}
 export default Function;

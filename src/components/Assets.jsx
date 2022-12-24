@@ -23,6 +23,8 @@ function Assets(props) {
             onChange={(e) => {
               setInput(e.target.value);
             }}
+            pattern="^[a-zA-Z][a-zA-Z0-9]{0,19}$"
+            required
           />
           <input type="submit" value=" " />
         </form>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Assets from "./Assets";
 import Fields from "./Fields";
@@ -10,11 +10,17 @@ import { Contract, Function as FunctionConstructor, getCode } from "./Contract";
 
 function ContractView(props) {
   const [cont, setCont] = useState(new Contract());
-
   return (
     <div className="grid-container">
+      <div className="grid-files">
+        <input type="file" onChange={handleFileSelect}></input>
+        <button onClick={saveState}>Save project</button>
+      </div>
       <div className="grid-name">
-        <Name handleAdd={(newName) => setCont({ ...cont, name: newName })} />
+        <Name
+          name={cont.name}
+          handleAdd={(newName) => setCont({ ...cont, name: newName })}
+        />
       </div>
       <div className="grid-assets">
         <Assets handleAdd={(asset) => addAsset(asset)} value={cont.assets} />
@@ -78,6 +84,27 @@ function ContractView(props) {
   }
   function addField(element) {
     setCont({ ...cont, fields: [...cont.fields, element] });
+  }
+  function saveState() {
+    const state = { cont };
+    const stateJson = JSON.stringify(state);
+
+    const a = document.createElement("a");
+    a.href =
+      "data:application/json;charset=utf-8," + encodeURIComponent(stateJson);
+    a.download = "state.json";
+    a.click();
+  }
+  function handleFileSelect(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const state = JSON.parse(event.target.result);
+      setCont(state.cont);
+    };
+
+    reader.readAsText(file);
   }
 }
 export default ContractView;

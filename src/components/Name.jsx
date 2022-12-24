@@ -10,10 +10,10 @@ function Name(props) {
       <input
         type="text"
         id="contract-name"
-        value={input}
+        value={props.name}
         onChange={(e) => {
           setInpunt(e.target.value);
-          handleChange();
+          props.handleAdd(e.target.value);
         }}
       />
     </div>
