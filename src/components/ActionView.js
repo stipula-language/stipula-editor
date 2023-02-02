@@ -8,13 +8,16 @@ export function ActionsList(props) {
         previous=""
         setActions={props.setActions}
         actions={props.actions}
+        when={props.actions.length <= 0}
       />
-      {props.actions.map((element) => {
+      {props.actions.map((element, i) => {
         return (
           <ActionView
             element={element}
             setActions={props.setActions}
             actions={props.actions}
+            deleteAction={props.deleteAction}
+            when={i >= props.actions.length - 1}
           />
         );
       })}
@@ -22,6 +25,7 @@ export function ActionsList(props) {
   );
 }
 function AddButton(props) {
+  //when = 1 if it has to show when types
   const [show, setShow] = useState(false);
   let menuRef = useRef();
 
@@ -70,12 +74,18 @@ function AddButton(props) {
         <DropdownItem text="Move x to y" type="MOVE1" {...props} />
         <DropdownItem text="Move a part of x to y" type="MOVE2" {...props} />
         <DropdownItem text="If something happen then..." type="IF" {...props} />
-        <DropdownItem text="After x time then..." type="WHEN1" {...props} />
-        <DropdownItem
-          text="At a certain date then..."
-          type="WHEN2"
-          {...props}
-        />
+        {!props.when ? (
+          <></>
+        ) : (
+          <>
+            <DropdownItem text="After x time then..." type="WHEN1" {...props} />
+            <DropdownItem
+              text="At a certain date then..."
+              type="WHEN2"
+              {...props}
+            />
+          </>
+        )}
       </div>
     </li>
   );
@@ -122,6 +132,10 @@ function ActionView(props) {
     let index = props.actions.findIndex((item) => item.id === elId);
     let tmp = props.actions.slice();
     tmp.splice(index, 1, { ...props.actions[index], elseThen: element });
+    props.setActions(tmp);
+  }
+  function deleteAction(elId) {
+    const tmp = props.actions.filter((item) => item.id !== elId);
     props.setActions(tmp);
   }
   return (
@@ -347,6 +361,7 @@ function ActionView(props) {
             case "WHEN1":
               return (
                 <div>
+                  <hr />
                   <label>After</label>
                   <input
                     type="text"
@@ -395,6 +410,7 @@ function ActionView(props) {
             case "WHEN2":
               return (
                 <div>
+                  <hr />
                   <label>At</label>
                   <input
                     type="date"
@@ -430,11 +446,16 @@ function ActionView(props) {
               return <>Error</>;
           }
         })()}
+        <button
+          className="delete-act"
+          onClick={() => deleteAction(props.element.id)}
+        ></button>
       </li>
       <AddButton
         previous={props.element.id}
         setActions={props.setActions}
         actions={props.actions}
+        when={props.when}
       />
     </div>
   );

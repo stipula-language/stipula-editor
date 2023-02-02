@@ -12,8 +12,9 @@ const Header = () => {
         </h3>
         <h4>
           This editor is a useful tool for writing contracts for Stipula in a
-          more intuitive way. You can find the prototype to run the language
-          here.
+          more intuitive way. You can find the prototype to run the
+          language&nbsp;
+          <a href="https://github.com/stipula-language/stipula">here</a>.
         </h4>
       </p>
     </>

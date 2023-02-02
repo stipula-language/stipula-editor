@@ -5,7 +5,7 @@ import Fields from "./Fields";
 import Name from "./Name";
 import Agreement from "./Agreement";
 import Function from "./Function";
-
+import { v4 as uuid } from "uuid";
 import { Contract, Function as FunctionConstructor, getCode } from "./Contract";
 
 function ContractView(props) {
@@ -13,7 +13,15 @@ function ContractView(props) {
   return (
     <div className="grid-container">
       <div className="grid-files">
-        <input type="file" onChange={handleFileSelect}></input>
+        <div>
+          Save the project to continue editing it later, beware: this is not the
+          executable file.
+        </div>
+        <input
+          type="file"
+          className="file-input"
+          onChange={handleFileSelect}
+        ></input>
         <button onClick={saveState}>Save project</button>
       </div>
       <div className="grid-name">
@@ -23,10 +31,18 @@ function ContractView(props) {
         />
       </div>
       <div className="grid-assets">
-        <Assets handleAdd={(asset) => addAsset(asset)} value={cont.assets} />
+        <Assets
+          handleAdd={(asset) => addAsset(asset)}
+          value={cont.assets}
+          deleteAsset={(asset) => deleteAsset(asset)}
+        />
       </div>
       <div className="grid-fields">
-        <Fields handleAdd={(field) => addField(field)} value={cont.fields} />
+        <Fields
+          handleAdd={(field) => addField(field)}
+          value={cont.fields}
+          deleteField={(field) => deleteField(field)}
+        />
       </div>
       <div className="grid-agreement">
         {" "}
@@ -38,13 +54,9 @@ function ContractView(props) {
       </div>
       <div className="grid-code">
         <p className="code">{getCode(cont)}</p>
+        <button onClick={handleDownload}>Download executable</button>
       </div>
-      <div className="grid-graph">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta laborum
-        sequi dolorum, hic sapiente deleniti ad corrupti nobis, enim aliquam
-        magnam incidunt necessitatibus id, illo praesentium corporis optio
-        numquam error.
-      </div>
+      <div className="grid-graph"></div>
       <div className="grid-function">
         {cont.functions.map((element, index) => {
           return (
@@ -57,6 +69,34 @@ function ContractView(props) {
               setFunction={(fun) => {
                 setFunction(fun, index);
               }}
+              deleteFunction={() => deleteFunction(index)}
+              deleteField={(name) => {
+                const updatedList = cont.functions[index].fields.filter(
+                  (item) => item !== name
+                );
+                setFunction(
+                  { ...cont.functions[index], fields: updatedList },
+                  index
+                );
+              }}
+              deleteAsset={(name) => {
+                const updatedList = cont.functions[index].assets.filter(
+                  (item) => item !== name
+                );
+                setFunction(
+                  { ...cont.functions[index], assets: updatedList },
+                  index
+                );
+              }}
+              deleteFromState={(name) => {
+                const updatedList = cont.functions[index].fromState.filter(
+                  (item) => item !== name
+                );
+                setFunction(
+                  { ...cont.functions[index], fromState: updatedList },
+                  index
+                );
+              }}
             />
           );
         })}
@@ -67,7 +107,7 @@ function ContractView(props) {
   function addFunction() {
     setCont({
       ...cont,
-      functions: [...cont.functions, new FunctionConstructor()],
+      functions: [...cont.functions, new FunctionConstructor(uuid())],
     });
   }
   function setFunction(element, index) {
@@ -76,14 +116,27 @@ function ContractView(props) {
     setCont({ ...cont, functions: tmp });
     console.log(cont);
   }
+  function deleteFunction(index) {
+    const updatedList = cont.functions.splice();
+    updatedList.splice(index, 1);
+    setCont({ ...cont, functions: updatedList });
+  }
   function setAgreement(element) {
     setCont({ ...cont, agreement: element });
   }
   function addAsset(element) {
     setCont({ ...cont, assets: [...cont.assets, element] });
   }
+  function deleteAsset(element) {
+    const updatedList = cont.assets.filter((item) => item !== element);
+    setCont({ ...cont, assets: updatedList });
+  }
   function addField(element) {
     setCont({ ...cont, fields: [...cont.fields, element] });
+  }
+  function deleteField(element) {
+    const updatedList = cont.fields.filter((item) => item !== element);
+    setCont({ ...cont, fields: updatedList });
   }
   function saveState() {
     const state = { cont };
@@ -92,7 +145,7 @@ function ContractView(props) {
     const a = document.createElement("a");
     a.href =
       "data:application/json;charset=utf-8," + encodeURIComponent(stateJson);
-    a.download = "state.json";
+    a.download = cont.name + ".json";
     a.click();
   }
   function handleFileSelect(event) {
@@ -105,6 +158,15 @@ function ContractView(props) {
     };
 
     reader.readAsText(file);
+  }
+  function handleDownload() {
+    const a = document.createElement("a");
+    a.href = "data:charset=utf-8," + encodeURIComponent(getCode(cont));
+
+    a.download = cont.name.trim().length
+      ? cont.name + ".stipula"
+      : "noname.stipula";
+    a.click();
   }
 }
 export default ContractView;

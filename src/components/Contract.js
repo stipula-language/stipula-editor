@@ -173,13 +173,14 @@ function Agreement() {
   this.fieldsParties = [];
 }
 
-export function Function() {
+export function Function(id) {
   this.name = "";
-  this.fromState = "";
+  this.fromState = [];
+  this.id = id;
   this.toState = "";
   this.assets = [];
   this.fields = [];
-  this.caller = "";
+  this.caller = [];
   this.conditions = [{ par1: "", par2: "", par3: "", par4: "" }];
   this.actions = [];
 }

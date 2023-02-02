@@ -6,6 +6,8 @@ function Function(props) {
   const [inputField, setInputField] = useState("");
   const [inputAsset, setInputAsset] = useState("");
   const [conditions, setConditions] = useState(props.fun.conditions);
+  const [caller, setCaller] = useState("");
+  const [fromState, setFromState] = useState("");
   function handleChangeActions(element) {
     props.setFunction({ ...props.fun, actions: element });
     console.log(props.fun);
@@ -13,14 +15,19 @@ function Function(props) {
   function handleChangeName(element) {
     props.setFunction({ ...props.fun, name: element });
   }
-  function handleChangeFromState(element) {
-    props.setFunction({ ...props.fun, fromState: element });
+  function addFromState(e) {
+    props.setFunction({
+      ...props.fun,
+      fromState: [...props.fun.fromState, fromState],
+    });
+    e.preventDefault();
   }
   function handleChangeToState(element) {
     props.setFunction({ ...props.fun, toState: element });
   }
-  function setCaller(element) {
-    props.setFunction({ ...props.fun, caller: element });
+  function addCaller(e) {
+    props.setFunction({ ...props.fun, caller: [...props.fun.caller, caller] });
+    e.preventDefault();
   }
   function handleAddField(e) {
     console.log(inputField);
@@ -51,7 +58,13 @@ function Function(props) {
   }, [conditions]);
   return (
     <div className="grid-container-function">
-      <div className="title">Function</div>
+      <div className="title">
+        <button
+          className="delete-f"
+          onClick={() => props.deleteFunction(props.fun.id)}
+        ></button>
+        Function
+      </div>
       <div className="grid-f-name">
         <label htmlFor="function-name">Name:</label>
         <input
@@ -63,16 +76,34 @@ function Function(props) {
           }}
         />
       </div>
-      <div className="grid-from-state">
+      <div className="grid-from-state list-box">
         <label htmlFor="function-from-state">From state:</label>
-        <input
-          id="function-from-state"
-          type="text"
-          value={props.fun.fromState}
-          onChange={(e) => {
-            handleChangeFromState(e.target.value);
-          }}
-        />
+        <ul>
+          {props.fun.fromState.map((element) => {
+            return (
+              <li>
+                <button
+                  className="delete-list-el"
+                  onClick={() => props.deleteFromState(element)}
+                ></button>
+                {element}
+              </li>
+            );
+          })}
+        </ul>
+        <form onSubmit={addFromState}>
+          <input
+            id="function-from-state"
+            type="text"
+            value={fromState}
+            onChange={(e) => {
+              setFromState(e.target.value);
+            }}
+            pattern="^[a-zA-Z][a-zA-Z0-9]{0,19}$"
+            required
+          />
+          <input type="submit" value=" "></input>
+        </form>
       </div>
       <div className="grid-to-state">
         <label htmlFor="function-to-state">To state:</label>
@@ -85,26 +116,50 @@ function Function(props) {
           }}
         />
       </div>
-      <div className="grid-f-party ">
-        <label htmlFor="function-caller">Who can call it?</label>
-        <select
-          onChange={(e) => {
-            setCaller(e.target.value);
-          }}
-        >
-          <option value="none" selected disabled hidden>
-            Select...
-          </option>
-          {props.parties.map((element) => {
-            return <option value={element}>{element}</option>;
+      <div className="grid-f-party list-box">
+        <label>Who can call it?</label>
+        <ul>
+          {props.fun.caller.map((element) => {
+            return (
+              <li>
+                <button
+                  className="delete-list-el"
+                  onClick={() => props.deleteParty(element)}
+                ></button>
+                {element}
+              </li>
+            );
           })}
-        </select>
+        </ul>
+        <form onSubmit={addCaller}>
+          <select
+            onChange={(e) => {
+              setCaller(e.target.value);
+            }}
+          >
+            <option value="none" selected disabled hidden>
+              Select...
+            </option>
+            {props.parties.map((element) => {
+              return <option value={element}>{element}</option>;
+            })}
+          </select>
+          <input type="submit" value=" "></input>
+        </form>
       </div>
       <div className="grid-f-fields list-box">
         <label>Formal parameters</label>
         <ul>
           {props.fun.fields.map((element) => {
-            return <li>{element}</li>;
+            return (
+              <li>
+                <button
+                  className="delete-list-el"
+                  onClick={() => props.deleteField(element)}
+                ></button>
+                {element}
+              </li>
+            );
           })}
         </ul>
         <form onSubmit={handleAddField}>
@@ -123,7 +178,15 @@ function Function(props) {
         <label>Assets parameters</label>
         <ul>
           {props.fun.assets.map((element) => {
-            return <li>{element}</li>;
+            return (
+              <li>
+                <button
+                  className="delete-list-el"
+                  onClick={() => props.deleteAsset(element)}
+                ></button>
+                {element}
+              </li>
+            );
           })}
         </ul>
         <form onSubmit={handleAddAsset}>

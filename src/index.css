@@ -140,6 +140,50 @@ input[type="submit"] {
   background-repeat: no-repeat;
   background-position: center;
 }
+.delete-list-el {
+  margin: 3px;
+  height: 10px;
+  width: 10px;
+  display: inline-block;
+  background-color: transparent;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  background-image: url("/public/icons/delete.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+}
+.delete-f {
+  margin: 3px;
+  height: 25px;
+  width: 25px;
+  display: inline-block;
+  background-color: white;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  background-image: url("/public/icons/delete.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  border-radius: 100%;
+}
+.delete-act {
+  margin: 3px;
+  height: 25px;
+  width: 25px;
+  display: inline-block;
+  background-color: white;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  background-image: url("/public/icons/delete.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  border-radius: 100%;
+}
 .list-box {
   background-color: white;
   width: 150px;
@@ -158,6 +202,36 @@ input[type="submit"] {
   height: 90px;
   padding: 0;
   overflow-y: scroll;
+}
+button {
+  background-color: #3c00b3;
+  border: none;
+  color: white;
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px; /* Set font size */
+  margin: 4px 2px; /* Add some margin */
+  cursor: pointer; /* Add cursor as a hand pointer */
+  border-radius: 5px; /* Add rounded corners */
+}
+.file-input::file-selector-button {
+  background-color: #3c00b3;
+  border: none;
+  color: white;
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px; /* Set font size */
+  margin: 4px 2px; /* Add some margin */
+  cursor: pointer; /* Add cursor as a hand pointer */
+  border-radius: 5px;
+}
+.list-box li {
+  text-align: left;
+  align-items: end;
 }
 .grid-container {
   display: grid;
@@ -275,4 +349,7 @@ input[type="submit"] {
 .action label {
   display: inline;
   margin: 0px 10px;
+}
+.action {
+  display: flex;
 }

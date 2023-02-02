@@ -12,7 +12,15 @@ function Fields(props) {
       <div className="list-box">
         <ul>
           {props.value.map((element) => {
-            return <li>{element}</li>;
+            return (
+              <li>
+                <button
+                  className="delete-list-el"
+                  onClick={() => props.deleteField(element)}
+                ></button>
+                {element}
+              </li>
+            );
           })}
         </ul>
         <form onSubmit={handleSubmit}>
