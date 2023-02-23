@@ -7,6 +7,7 @@ import Agreement from "./Agreement";
 import Function from "./Function";
 import { v4 as uuid } from "uuid";
 import { Contract, Function as FunctionConstructor, getCode } from "./Contract";
+import { cleanStr } from "./Contract";
 
 function ContractView(props) {
   const [cont, setCont] = useState(new Contract());
@@ -27,7 +28,7 @@ function ContractView(props) {
       <div className="grid-name">
         <Name
           name={cont.name}
-          handleAdd={(newName) => setCont({ ...cont, name: newName })}
+          handleAdd={(newName) => setCont({ ...cont, name: cleanStr(newName) })}
         />
       </div>
       <div className="grid-assets">
@@ -65,7 +66,11 @@ function ContractView(props) {
               actions={element.actions}
               fields={cont.fields}
               assets={cont.assets}
-              parties={cont.agreement.parties}
+              parties={[
+                ...cont.agreement.parties,
+                cont.agreement.authority,
+                cont.agreement.dataSource,
+              ].filter((str) => str.trim() !== "")}
               setFunction={(fun) => {
                 setFunction(fun, index);
               }}
@@ -97,6 +102,15 @@ function ContractView(props) {
                   index
                 );
               }}
+              deleteParty={(name) => {
+                const updatedList = cont.functions[index].caller.filter(
+                  (item) => item !== name
+                );
+                setFunction(
+                  { ...cont.functions[index], caller: updatedList },
+                  index
+                );
+              }}
             />
           );
         })}
@@ -117,22 +131,25 @@ function ContractView(props) {
     console.log(cont);
   }
   function deleteFunction(index) {
-    const updatedList = cont.functions.splice();
+    const updatedList = cont.functions.slice();
     updatedList.splice(index, 1);
+
     setCont({ ...cont, functions: updatedList });
   }
   function setAgreement(element) {
     setCont({ ...cont, agreement: element });
   }
   function addAsset(element) {
-    setCont({ ...cont, assets: [...cont.assets, element] });
+    if (!cont.assets.includes((element = cleanStr(element))))
+      setCont({ ...cont, assets: [...cont.assets, element] });
   }
   function deleteAsset(element) {
     const updatedList = cont.assets.filter((item) => item !== element);
     setCont({ ...cont, assets: updatedList });
   }
   function addField(element) {
-    setCont({ ...cont, fields: [...cont.fields, element] });
+    if (!cont.fields.includes((element = cleanStr(element))))
+      setCont({ ...cont, fields: [...cont.fields, element] });
   }
   function deleteField(element) {
     const updatedList = cont.fields.filter((item) => item !== element);

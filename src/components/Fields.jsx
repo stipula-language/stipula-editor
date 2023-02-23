@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cleanStr } from "./Contract";
 function Fields(props) {
   const [input, setInput] = useState("");
   function handleSubmit(e) {
@@ -28,9 +29,8 @@ function Fields(props) {
             type="text"
             value={input}
             onChange={(e) => {
-              setInput(e.target.value);
+              setInput(cleanStr(e.target.value));
             }}
-            pattern="^[a-zA-Z][a-zA-Z0-9]{0,19}$"
             required
           />
           <input type="submit" value=" " />

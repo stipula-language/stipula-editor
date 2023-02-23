@@ -8,16 +8,22 @@ export function ActionsList(props) {
         previous=""
         setActions={props.setActions}
         actions={props.actions}
-        when={props.actions.length <= 0}
+        when={props.father && props.actions.length <= 0}
       />
       {props.actions.map((element, i) => {
         return (
           <ActionView
+            par={{
+              par1: element.par1,
+              par2: element.par2,
+              par3: element.par3,
+              par4: element.par4,
+            }}
             element={element}
             setActions={props.setActions}
             actions={props.actions}
             deleteAction={props.deleteAction}
-            when={i >= props.actions.length - 1}
+            when={props.father && i >= props.actions.length - 1}
           />
         );
       })}
@@ -91,7 +97,12 @@ function AddButton(props) {
   );
 }
 function ActionView(props) {
-  const [par, setPar] = useState({ par1: "", par2: "", par3: "", par4: "" });
+  const [par, setPar] = useState({
+    par1: "",
+    par2: "",
+    par3: "",
+    par4: "",
+  });
   const [conditions, setConditions] = useState(props.element.conditions);
   useEffect(() => {
     console.log("State changed:", par);
@@ -150,7 +161,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par1: e.target.value });
+                      setPar({ ...props.par, par1: e.target.value });
                     }}
                     value={props.element.par1}
                   />
@@ -158,7 +169,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par2: e.target.value });
+                      setPar({ ...props.par, par2: e.target.value });
                     }}
                     value={props.element.par2}
                   />
@@ -171,13 +182,13 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par1: e.target.value });
+                      setPar({ ...props.par, par1: e.target.value });
                     }}
                     value={props.element.par1}
                   />
                   <select
                     onChange={(e) => {
-                      setPar({ ...par, par2: e.target.value });
+                      setPar({ ...props.par, par2: e.target.value });
                     }}
                     value={props.element.par2}
                   >
@@ -192,7 +203,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par3: e.target.value });
+                      setPar({ ...props.par, par3: e.target.value });
                     }}
                     value={props.element.par3}
                   />
@@ -200,7 +211,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par4: e.target.value });
+                      setPar({ ...props.par, par4: e.target.value });
                     }}
                     value={props.element.par4}
                   />
@@ -213,7 +224,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par1: e.target.value });
+                      setPar({ ...props.par, par1: e.target.value });
                     }}
                     value={props.element.par1}
                   />
@@ -221,7 +232,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par2: e.target.value });
+                      setPar({ ...props.par, par2: e.target.value });
                     }}
                     value={props.element.par2}
                   />
@@ -234,7 +245,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par1: e.target.value });
+                      setPar({ ...props.par, par1: e.target.value });
                     }}
                     value={props.element.par1}
                   />
@@ -242,7 +253,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par2: e.target.value });
+                      setPar({ ...props.par, par2: e.target.value });
                     }}
                     value={props.element.par2}
                   />
@@ -250,7 +261,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par3: e.target.value });
+                      setPar({ ...props.par, par3: e.target.value });
                     }}
                     value={props.element.par3}
                   />
@@ -293,7 +304,7 @@ function ActionView(props) {
                               <option value="" selected disabled hidden>
                                 Select...
                               </option>
-                              <option value="=">equal</option>
+                              <option value="==">equal</option>
                               <option value="<">smaller</option>
                               <option value="<=">smaller or equal</option>
                               <option value=">=">greater or equal</option>
@@ -350,80 +361,68 @@ function ActionView(props) {
                   <ActionsList
                     actions={props.element.ifThen}
                     setActions={(el) => setThen(el, props.element.id)}
+                    father={0}
                   />
                   <label>else:</label>
                   <ActionsList
                     actions={props.element.elseThen}
                     setActions={(el) => setElseThen(el, props.element.id)}
+                    father={0}
                   />
                 </div>
               );
             case "WHEN1":
               return (
                 <div>
-                  <hr />
                   <label>After</label>
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par1: e.target.value });
+                      setPar({ ...props.par, par1: e.target.value });
                     }}
                     value={props.element.par1}
                   />
-                  <select
-                    onChange={(e) => {
-                      setPar({ ...par, par2: e.target.value });
-                    }}
-                    value={props.element.par2}
-                  >
-                    <option value="none" selected disabled hidden>
-                      Select...
-                    </option>
-                    <option value="d">days</option>
-                    <option value="w">weeks</option>
-                    <option value="m">months</option>
-                    <option value="y">years</option>
-                  </select>
-                  <label>from state:</label>
+
+                  <label>move from state:</label>
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par3: e.target.value });
+                      setPar({ ...props.par, par2: e.target.value });
                     }}
-                    value={props.element.par3}
+                    value={props.element.par2}
                   />
                   <label>to state:</label>
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par4: e.target.value });
+                      setPar({ ...props.par, par3: e.target.value });
                     }}
-                    value={props.element.par4}
+                    value={props.element.par3}
                   />
                   <label>then:</label>
                   <ActionsList
                     actions={props.element.ifThen}
                     setActions={(el) => setThen(el, props.element.id)}
+                    father={0}
                   />
                 </div>
               );
             case "WHEN2":
               return (
                 <div>
-                  <hr />
                   <label>At</label>
                   <input
                     type="date"
                     onChange={(e) => {
-                      setPar({ ...par, par1: e.target.value });
+                      setPar({ ...props.par, par1: e.target.value });
                     }}
                     value={props.element.par1}
                   />
-                  <label>from state:</label>
+                  <label>move from state:</label>
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par2: e.target.value });
+                      setPar({ ...props.par, par2: e.target.value });
                     }}
                     value={props.element.par2}
                   />
@@ -431,7 +430,7 @@ function ActionView(props) {
                   <input
                     type="text"
                     onChange={(e) => {
-                      setPar({ ...par, par3: e.target.value });
+                      setPar({ ...props.par, par3: e.target.value });
                     }}
                     value={props.element.par3}
                   />
@@ -439,6 +438,7 @@ function ActionView(props) {
                   <ActionsList
                     actions={props.element.ifThen}
                     setActions={(el) => setThen(el, props.element.id)}
+                    father={0}
                   />
                 </div>
               );
@@ -451,12 +451,16 @@ function ActionView(props) {
           onClick={() => deleteAction(props.element.id)}
         ></button>
       </li>
-      <AddButton
-        previous={props.element.id}
-        setActions={props.setActions}
-        actions={props.actions}
-        when={props.when}
-      />
+      {props.element.type != "WHEN1" && props.element.type != "WHEN2" ? (
+        <AddButton
+          previous={props.element.id}
+          setActions={props.setActions}
+          actions={props.actions}
+          when={props.when}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

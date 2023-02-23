@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { cleanStr } from "./Contract";
 function Agreement(props) {
   const [inputParty, setInputParty] = useState("");
   const [inputFA, setInputFA] = useState("");
@@ -16,10 +16,11 @@ function Agreement(props) {
     props.setAgreement({ ...props.agreement, dataSource: value });
   }
   function handleAddParty(e) {
-    props.setAgreement({
-      ...props.agreement,
-      parties: [...props.agreement.parties, inputParty],
-    });
+    if (!props.agreement.parties.includes(cleanStr(inputParty)))
+      props.setAgreement({
+        ...props.agreement,
+        parties: [...props.agreement.parties, cleanStr(inputParty)],
+      });
 
     e.preventDefault();
     setInputParty("");
@@ -30,13 +31,13 @@ function Agreement(props) {
     );
     props.setAgreement({ ...props.agreement, parties: updatedList });
   }
-  function handleAddFieldAuth(e) {
-    props.setAgreement({
-      ...props.agreement,
-      fieldsAuthority: [...props.agreement.fieldsAuthority, inputFA],
-    });
-
-    e.preventDefault();
+  function handleAddFieldAuth(element) {
+    if (!props.agreement.fieldsAuthority.includes(element))
+      props.setAgreement({
+        ...props.agreement,
+        fieldsAuthority: [...props.agreement.fieldsAuthority, element],
+      });
+    setInputFA("");
   }
   function handleDeleteFieldAuth(element) {
     const updatedList = props.agreement.fieldsAuthority.filter(
@@ -44,13 +45,13 @@ function Agreement(props) {
     );
     props.setAgreement({ ...props.agreement, fieldsAuthority: updatedList });
   }
-  function handleAddFieldDS(e) {
-    props.setAgreement({
-      ...props.agreement,
-      fieldsDS: [...props.agreement.fieldsDS, inputFDS],
-    });
-
-    e.preventDefault();
+  function handleAddFieldDS(element) {
+    if (!props.agreement.fieldsDS.includes(element))
+      props.setAgreement({
+        ...props.agreement,
+        fieldsDS: [...props.agreement.fieldsDS, element],
+      });
+    setInputFDS("");
   }
   function handleDeleteFieldDS(element) {
     const updatedList = props.agreement.fieldsDS.filter(
@@ -58,12 +59,13 @@ function Agreement(props) {
     );
     props.setAgreement({ ...props.agreement, fieldsDS: updatedList });
   }
-  function handleAddFieldParties(e) {
-    props.setAgreement({
-      ...props.agreement,
-      fieldsParties: [...props.agreement.fieldsParties, inputFP],
-    });
-    e.preventDefault();
+  function handleAddFieldParties(element) {
+    if (!props.agreement.fieldsParties.includes(element))
+      props.setAgreement({
+        ...props.agreement,
+        fieldsParties: [...props.agreement.fieldsParties, element],
+      });
+    setInputFP("");
   }
   function handleDeleteFieldParties(element) {
     const updatedList = props.agreement.fieldsParties.filter(
@@ -92,7 +94,7 @@ function Agreement(props) {
           type="text"
           value={props.agreement.authority}
           onChange={(e) => {
-            handleChangeAuthority(e.target.value);
+            handleChangeAuthority(cleanStr(e.target.value));
           }}
         />
       </div>
@@ -103,7 +105,7 @@ function Agreement(props) {
           type="text"
           value={props.agreement.dataSource}
           onChange={(e) => {
-            handleChangeDS(e.target.value);
+            handleChangeDS(cleanStr(e.target.value));
           }}
         />
       </div>
@@ -127,9 +129,8 @@ function Agreement(props) {
             type="text"
             value={inputParty}
             onChange={(e) => {
-              setInputParty(e.target.value);
+              setInputParty(cleanStr(e.target.value));
             }}
-            pattern="^[a-zA-Z][a-zA-Z0-9]{0,19}$"
             required
           />
           <input type="submit" value=" " />
@@ -150,21 +151,21 @@ function Agreement(props) {
             );
           })}
         </ul>
-        <form onSubmit={handleAddFieldAuth}>
+        <form>
           <select
             type="text"
             onChange={(e) => {
-              setInputFA(e.target.value);
+              handleAddFieldAuth(e.target.value);
             }}
+            value={inputFA}
           >
-            <option value="none" selected disabled hidden>
+            <option value="" selected disabled hidden>
               Select...
             </option>
             {props.fields.map((element) => {
               return <option value={element}>{element}</option>;
             })}
           </select>
-          <input type="submit" value=" " />
         </form>
       </div>
       <div className="grid-fields-ds list-box">
@@ -182,21 +183,21 @@ function Agreement(props) {
             );
           })}
         </ul>
-        <form onSubmit={handleAddFieldDS}>
+        <form>
           <select
             type="text"
             onChange={(e) => {
-              setInputFDS(e.target.value);
+              handleAddFieldDS(e.target.value);
             }}
+            value={inputFDS}
           >
-            <option value="none" selected disabled hidden>
+            <option value="" selected disabled hidden>
               Select...
             </option>
             {props.fields.map((element) => {
               return <option value={element}>{element}</option>;
             })}
           </select>
-          <input type="submit" value=" " />
         </form>
       </div>
 
@@ -215,21 +216,21 @@ function Agreement(props) {
             );
           })}
         </ul>
-        <form onSubmit={handleAddFieldParties}>
+        <form>
           <select
             type="text"
             onChange={(e) => {
-              setInputFP(e.target.value);
+              handleAddFieldParties(e.target.value);
             }}
+            value={inputFP}
           >
-            <option value="none" selected disabled hidden>
+            <option value="" selected disabled hidden>
               Select...
             </option>
             {props.fields.map((element) => {
               return <option value={element}>{element}</option>;
             })}
           </select>
-          <input type="submit" value=" " />
         </form>
       </div>
     </div>

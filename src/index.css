@@ -26,6 +26,7 @@ header {
   padding: 10px 20px;
   border: solid 1px #007d7d;
   width: 200px;
+  z-index: 20;
 }
 .dropdown li {
   margin: 3px 0;
@@ -155,11 +156,10 @@ input[type="submit"] {
   background-size: contain;
 }
 .delete-f {
-  margin: 3px;
+  margin-right: 20px;
   height: 25px;
   width: 25px;
   display: inline-block;
-  background-color: white;
   padding: 8px;
   border: none;
   cursor: pointer;
@@ -231,7 +231,8 @@ button {
 }
 .list-box li {
   text-align: left;
-  align-items: end;
+  display: flex;
+  align-items: center;
 }
 .grid-container {
   display: grid;
@@ -322,9 +323,31 @@ button {
 }
 .grid-container-function > .title {
   grid-column: 1/5;
+  display: flex;
+  align-items: center;
+}
+.grid-container-function > .title button:last-child {
+  margin-left: auto;
+  background-color: transparent;
+  text-decoration: underline;
 }
 .grid-f-name {
   grid-column: 1/2;
+}
+.f-recap {
+  margin-top: -25px;
+  text-align: left;
+  font-size: 14px;
+  grid-column: 1/-1;
+}
+.grid-f-party {
+  grid-column: 3/4;
+}
+.grid-f-fields {
+  grid-column: 1/2;
+}
+.grid-f-assets {
+  grid-column: 2/3;
 }
 .grid-f-conditions {
   grid-column: 1/4;

@@ -24,10 +24,11 @@ function printActions(ac, i, tab) {
         break;
       case "MOVE2":
         act +=
+          "(" +
           ac[i].par1 +
           "*" +
           ac[i].par2 +
-          " -o " +
+          ") -o " +
           ac[i].par2 +
           ", " +
           ac[i].par3;
@@ -41,33 +42,27 @@ function printActions(ac, i, tab) {
             cond.par3 +
             (cond.par4 != "" ? " " + cond.par4 + " " : "");
         });
-        act += ") {\n";
+        act += ") {";
         act +=
-          printActions(ac[i].ifThen, 0, tab + tab) +
+          printActions(ac[i].ifThen, 0, tab + tab).slice(0, -3) +
+          "\n" +
+          tab +
+          "_\n" +
           (ac[i].elseThen.length > 0
-            ? tab + "else {\n" + printActions(ac[i].elseThen, 0, tab + tab)
+            ? tab +
+              "else {" +
+              printActions(ac[i].elseThen, 0, tab + tab).slice(0, -3)
             : "");
-        act += tab + "}";
+        act += "\n" + tab + "}";
         break;
 
       case "WHEN1":
-        act +=
-          "now + " +
-          ac[i].par1 +
-          " " +
-          ac[i].par2 +
-          " >> @" +
-          ac[i].par2 +
-          " {\n ";
-        act +=
-          printActions(ac[i].ifThen, 0, tab + tab) +
-          (ac[i].elseThen.length > 0
-            ? tab + "else {\n" + printActions(ac[i].elseThen, 0, tab + tab)
-            : "");
+        act += "now + " + ac[i].par1 + " >> @" + ac[i].par2 + " {";
+        act += printActions(ac[i].ifThen, 0, tab + tab).slice(0, -3) + "\n";
         act += tab + "} ==> @" + ac[i].par3;
         break;
       case "WHEN2":
-        act += ac[i].par1 + " >> @" + ac[i].par2 + " {\n ";
+        act += ac[i].par1 + " >> @" + ac[i].par2 + " {";
         act +=
           printActions(ac[i].ifThen, 0, tab + tab) +
           (ac[i].elseThen.length > 0
@@ -76,48 +71,70 @@ function printActions(ac, i, tab) {
         act += tab + "} ==> @" + ac[i].par3;
         break;
     }
-    return act + "\n" + printActions(ac, i + 1, tab);
+    if (i == ac.length - 1 && ac[i].type != "WHEN1" && ac[i].type != "WHEN2") {
+      act = "\n" + act;
+      act += ";\n_";
+    } else if (i == ac.length - 1) {
+      act = ";\n" + act;
+    } else {
+      act = "\n" + act;
+    }
+    return act + printActions(ac, i + 1, tab);
   } else return "";
 }
 export function getCode(contract) {
   var tab = "  ";
 
   // AGREEMENT
-  var assets = "assets " + contract.assets.join(", ");
+  var assets = "asset " + contract.assets.join(", ");
 
-  var fields = "fields " + contract.fields.join(", ");
+  var fields = "field " + contract.fields.join(", ");
 
-  var agreement =
-    "agreement (" +
-    contract.agreement.parties.join(", ") +
-    ", " +
-    contract.agreement.dataSource +
-    ", " +
-    contract.agreement.authority +
+  var agreement = "agreement (" + contract.agreement.parties.join(", ");
+  agreement +=
+    contract.agreement.dataSource != ""
+      ? ", " + contract.agreement.dataSource
+      : "";
+  agreement +=
+    contract.agreement.authority != ""
+      ? ", " + contract.agreement.authority
+      : "";
+  agreement +=
+    ")(" +
+    [
+      ...new Set([
+        ...contract.agreement.fieldsAuthority,
+        ...contract.agreement.fieldsDS,
+        ...contract.agreement.fieldsParties,
+      ]),
+    ].join(", ") +
     ") {\n" +
     tab;
   agreement +=
-    contract.agreement.fieldsAuthority.length != 0
+    contract.agreement.fieldsAuthority.length != 0 &&
+    contract.agreement.authority != ""
       ? contract.agreement.authority +
         ", " +
         contract.agreement.parties.join(", ") +
+        ": " +
         contract.agreement.fieldsAuthority.join(", ") +
         "\n"
       : "";
   agreement +=
-    contract.agreement.fieldsDS.length != 0
-      ? contract.agreement.ds +
+    contract.agreement.fieldsDS.length != 0 &&
+    contract.agreement.dataSource != ""
+      ? contract.agreement.dataSource +
         ", " +
         contract.agreement.parties.join(", ") +
-        contract.agreement.fieldsAuthority.join(", ") +
+        ": " +
+        contract.agreement.fieldsDS.join(", ") +
         "\n"
       : "";
   agreement +=
     contract.agreement.fieldsParties.length != 0
-      ? +contract.agreement.ds +
-        ", " +
-        contract.agreement.parties.join(", ") +
-        contract.agreement.fieldsAuthority.join(", ")
+      ? contract.agreement.parties.join(", ") +
+        ": " +
+        contract.agreement.fieldsParties.join(", ")
       : "";
   agreement += "\n} ==> @" + contract.agreement.state;
 
@@ -126,7 +143,7 @@ export function getCode(contract) {
   contract.functions.map((el) => {
     fun +=
       "\n\n@" +
-      el.fromState +
+      el.fromState.join("@") +
       " " +
       el.caller +
       " : " +
@@ -136,16 +153,20 @@ export function getCode(contract) {
       ")" +
       "[" +
       el.assets.join(", ") +
-      "]" +
-      "\n(";
-    el.conditions.map((cond) => {
-      fun +=
-        cond.par1 +
-        cond.par2 +
-        cond.par3 +
-        (cond.par4 != "" ? " " + cond.par4 + " " : "");
-    });
-    fun += "){\n" + printActions(el.actions, 0, tab) + "\n}\n";
+      "]";
+
+    if (el.conditions.length > 1 || el.conditions[0].par1 != "") {
+      fun += "(";
+      el.conditions.map((cond) => {
+        fun +=
+          cond.par1 +
+          cond.par2 +
+          cond.par3 +
+          (cond.par4 != "" ? " " + cond.par4 + " " : "");
+      });
+      fun += ")";
+    }
+    fun += "{" + printActions(el.actions, 0, tab) + "\n} ==> @" + el.toState;
   });
 
   var code =
@@ -157,10 +178,15 @@ export function getCode(contract) {
     "\n" +
     tab +
     fields +
+    "\n" +
+    tab +
+    "init " +
+    contract.agreement.state +
     "\n\n" +
     tab +
     agreement +
-    fun;
+    fun +
+    "\n}";
   return code;
 }
 function Agreement() {
@@ -196,4 +222,7 @@ export function Action(type, id) {
   this.conditions = [{ par1: "", par2: "", par3: "", par4: "" }];
   this.ifThen = [];
   this.elseThen = [];
+}
+export function cleanStr(str) {
+  return str.replace(/[^a-zA-Z0-9_]/g, "");
 }
