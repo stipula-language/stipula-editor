@@ -4,7 +4,7 @@ import ActionView, { ActionsList } from "./ActionView";
 import { cleanStr } from "./Contract";
 
 function Function(props) {
-  const [hyde, setHyde] = useState(false);
+  const [hide, setHide] = useState(false);
   const [inputField, setInputField] = useState("");
   const [inputAsset, setInputAsset] = useState("");
   const [conditions, setConditions] = useState(props.fun.conditions);
@@ -36,6 +36,15 @@ function Function(props) {
         caller: [...props.fun.caller, element],
       });
     setCaller("");
+  }
+  function handleAddCaller(e) {
+    if (!props.fun.caller.includes(caller))
+      props.setFunction({
+        ...props.fun,
+        caller: [...props.fun.caller, caller],
+      });
+    setCaller("");
+    e.preventDefault();
   }
   function handleAddField(e) {
     if (!props.fun.fields.includes(inputField))
@@ -72,11 +81,11 @@ function Function(props) {
           onClick={() => props.deleteFunction()}
         ></button>
         Function: {props.fun.name}
-        <button onClick={() => setHyde(!hyde)}>
-          {hyde ? "expand" : "collapse"}
+        <button onClick={() => setHide(!hide)}>
+          {hide ? "expand" : "collapse"}
         </button>
       </div>
-      {!hyde ? (
+      {!hide ? (
         <>
           <div className="grid-f-name">
             <label htmlFor="function-name">Name:</label>
@@ -89,6 +98,17 @@ function Function(props) {
               }}
             />
           </div>
+          <div>
+            <label>Higher-order function</label>
+            <input
+              type={"checkbox"}
+              onChange={(e) => {
+                props.setFunction({ ...props.fun, isHO: e.target.checked });
+              }}
+              checked={props.fun.isHO}
+            ></input>
+          </div>
+
           <div className="grid-from-state list-box">
             <label htmlFor="function-from-state">From state:</label>
             <ul>
@@ -118,18 +138,6 @@ function Function(props) {
               <input type="submit" value=" "></input>
             </form>
           </div>
-          <div className="grid-to-state">
-            <label htmlFor="function-to-state">To state:</label>
-            <input
-              id="function-to-state"
-              type="text"
-              value={props.fun.toState}
-              onChange={(e) => {
-                handleChangeToState(cleanStr(e.target.value));
-              }}
-            />
-          </div>
-
           <div className="grid-f-fields list-box">
             <label>Formal parameters</label>
             <ul>
@@ -198,100 +206,142 @@ function Function(props) {
                 );
               })}
             </ul>
-            <form>
-              <select
-                onChange={(e) => {
-                  addCaller(e.target.value);
-                }}
-                value={caller}
-              >
-                <option value="" selected disabled hidden>
-                  Select...
-                </option>
-                {props.parties.map((element) => {
-                  return <option value={element}>{element}</option>;
-                })}
-              </select>
-            </form>
+
+            {props.isHO !== 1 ? (
+              <>
+                <form>
+                  <select
+                    onChange={(e) => {
+                      addCaller(e.target.value);
+                    }}
+                    value={caller}
+                  >
+                    <option value="" selected disabled hidden>
+                      Select...
+                    </option>
+                    {props.parties.map((element) => {
+                      return <option value={element}>{element}</option>;
+                    })}
+                  </select>
+                </form>
+              </>
+            ) : (
+              <>
+                <form onSubmit={handleAddCaller}>
+                  <input
+                    type="text"
+                    value={caller}
+                    onChange={(e) => {
+                      setCaller(cleanStr(e.target.value));
+                    }}
+                  />
+                  <input type="submit" value=" " />
+                </form>
+              </>
+            )}
           </div>
-          <div className="grid-f-conditions">
-            <ul>
-              <label>Necessary conditions for executing actions:</label>
-              {props.fun.conditions.map((cond, i) => {
-                return (
-                  <li>
-                    <input
-                      type="text"
-                      onChange={(e) => {
-                        setCondition({ ...cond, par1: e.target.value }, i);
-                      }}
-                      value={cond.par1}
-                    />
-                    <select
-                      onChange={(e) => {
-                        setCondition({ ...cond, par2: e.target.value }, i);
-                      }}
-                      value={cond.par2}
-                    >
-                      <option value="" selected>
-                        Select...
-                      </option>
-                      <option value="==">equal</option>
-                      <option value="<">smaller</option>
-                      <option value="<=">smaller or equal</option>
-                      <option value=">=">greater or equal</option>
-                      <option value=">">greater</option>
-                      <option value="!=">different</option>
-                    </select>
-                    <input
-                      type="text"
-                      onChange={(e) => {
-                        setCondition({ ...cond, par3: e.target.value }, i);
-                      }}
-                      value={cond.par3}
-                    />
-                    <select
-                      onChange={(e) => {
-                        console.log(conditions);
-                        if (e.target.value == "") {
-                          console.log(1);
-                          let tmp = conditions.slice(0, i);
-                          tmp[i] = { ...cond, par4: e.target.value };
-                          setConditions(tmp);
-                        } else if (conditions.length <= i + 1) {
-                          console.log(i, conditions.length);
-                          let tmp = conditions.slice();
-                          tmp[i] = { ...cond, par4: e.target.value };
-                          tmp = tmp.concat({
-                            par1: "",
-                            par2: "",
-                            par3: "",
-                            par4: "",
-                          });
-                          setConditions(tmp);
-                        } else
-                          setCondition({ ...cond, par4: e.target.value }, i);
-                      }}
-                      value={cond.par4}
-                    >
-                      <option value="" selected></option>
-                      <option value="&&">and</option>
-                      <option value="||">or</option>
-                    </select>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <div className="grid-f-actions">
-            <ul>
-              <ActionsList
-                actions={props.fun.actions}
-                setActions={handleChangeActions}
-                father={1}
-              />
-            </ul>
-          </div>
+
+          {!props.fun.isHO ? (
+            <>
+              <div className="grid-to-state">
+                <label htmlFor="function-to-state">To state:</label>
+                <input
+                  id="function-to-state"
+                  type="text"
+                  value={props.fun.toState}
+                  onChange={(e) => {
+                    handleChangeToState(cleanStr(e.target.value));
+                  }}
+                />
+              </div>
+
+              <div className="grid-f-conditions">
+                <ul>
+                  <label>Necessary conditions for executing actions:</label>
+                  {props.fun.conditions.map((cond, i) => {
+                    return (
+                      <li>
+                        <input
+                          type="text"
+                          onChange={(e) => {
+                            setCondition({ ...cond, par1: e.target.value }, i);
+                          }}
+                          value={cond.par1}
+                        />
+                        <select
+                          onChange={(e) => {
+                            setCondition({ ...cond, par2: e.target.value }, i);
+                          }}
+                          value={cond.par2}
+                        >
+                          <option value="" selected>
+                            Select...
+                          </option>
+                          <option value="==">equal</option>
+                          <option value="<">smaller</option>
+                          <option value="<=">smaller or equal</option>
+                          <option value=">=">greater or equal</option>
+                          <option value=">">greater</option>
+                          <option value="!=">different</option>
+                        </select>
+                        <input
+                          type="text"
+                          onChange={(e) => {
+                            setCondition({ ...cond, par3: e.target.value }, i);
+                          }}
+                          value={cond.par3}
+                        />
+                        <select
+                          onChange={(e) => {
+                            console.log(conditions);
+                            if (e.target.value == "") {
+                              console.log(1);
+                              let tmp = conditions.slice(0, i);
+                              tmp[i] = { ...cond, par4: e.target.value };
+                              setConditions(tmp);
+                            } else if (conditions.length <= i + 1) {
+                              console.log(i, conditions.length);
+                              let tmp = conditions.slice();
+                              tmp[i] = { ...cond, par4: e.target.value };
+                              tmp = tmp.concat({
+                                par1: "",
+                                par2: "",
+                                par3: "",
+                                par4: "",
+                              });
+                              setConditions(tmp);
+                            } else
+                              setCondition(
+                                { ...cond, par4: e.target.value },
+                                i
+                              );
+                          }}
+                          value={cond.par4}
+                        >
+                          <option value="" selected>
+                            Add condition...
+                          </option>
+                          <option value="&&">and</option>
+                          <option value="||">or</option>
+                        </select>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+              <div className="grid-f-actions">
+                <ul>
+                  <ActionsList
+                    actions={props.fun.actions}
+                    setActions={handleChangeActions}
+                    father={1}
+                  />
+                </ul>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
         </>
       ) : (
         <div className="f-recap">

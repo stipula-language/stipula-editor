@@ -5,7 +5,20 @@ export class Contract {
     this.name = "";
     this.assets = [];
     this.fields = [];
-    this.agreement = new Agreement();
+    this.firstState = "";
+    this.parties = [];
+    this.agreements = [{ parties: [], fields: [] }];
+    this.functions = [];
+    this.HOinputs = [];
+  }
+}
+export class HOinput {
+  constructor() {
+    this.assets = [];
+    this.fields = [];
+    this.toState = "";
+    this.parties = [];
+    this.actions = [];
     this.functions = [];
   }
 }
@@ -82,65 +95,10 @@ function printActions(ac, i, tab) {
     return act + printActions(ac, i + 1, tab);
   } else return "";
 }
-export function getCode(contract) {
+function printFunctions(functions) {
   var tab = "  ";
-
-  // AGREEMENT
-  var assets = "asset " + contract.assets.join(", ");
-
-  var fields = "field " + contract.fields.join(", ");
-
-  var agreement = "agreement (" + contract.agreement.parties.join(", ");
-  agreement +=
-    contract.agreement.dataSource != ""
-      ? ", " + contract.agreement.dataSource
-      : "";
-  agreement +=
-    contract.agreement.authority != ""
-      ? ", " + contract.agreement.authority
-      : "";
-  agreement +=
-    ")(" +
-    [
-      ...new Set([
-        ...contract.agreement.fieldsAuthority,
-        ...contract.agreement.fieldsDS,
-        ...contract.agreement.fieldsParties,
-      ]),
-    ].join(", ") +
-    ") {\n" +
-    tab;
-  agreement +=
-    contract.agreement.fieldsAuthority.length != 0 &&
-    contract.agreement.authority != ""
-      ? contract.agreement.authority +
-        ", " +
-        contract.agreement.parties.join(", ") +
-        ": " +
-        contract.agreement.fieldsAuthority.join(", ") +
-        "\n"
-      : "";
-  agreement +=
-    contract.agreement.fieldsDS.length != 0 &&
-    contract.agreement.dataSource != ""
-      ? contract.agreement.dataSource +
-        ", " +
-        contract.agreement.parties.join(", ") +
-        ": " +
-        contract.agreement.fieldsDS.join(", ") +
-        "\n"
-      : "";
-  agreement +=
-    contract.agreement.fieldsParties.length != 0
-      ? contract.agreement.parties.join(", ") +
-        ": " +
-        contract.agreement.fieldsParties.join(", ")
-      : "";
-  agreement += "\n} ==> @" + contract.agreement.state;
-
-  //FUNCTIONS
   var fun = "";
-  contract.functions.map((el) => {
+  functions.map((el) => {
     fun +=
       "\n\n@" +
       el.fromState.join("@") +
@@ -155,7 +113,7 @@ export function getCode(contract) {
       el.assets.join(", ") +
       "]";
 
-    if (el.conditions.length > 1 || el.conditions[0].par1 != "") {
+    if (!el.isHO && (el.conditions.length > 1 || el.conditions[0].par1 != "")) {
       fun += "(";
       el.conditions.map((cond) => {
         fun +=
@@ -166,8 +124,61 @@ export function getCode(contract) {
       });
       fun += ")";
     }
-    fun += "{" + printActions(el.actions, 0, tab) + "\n} ==> @" + el.toState;
+    if (!el.isHO)
+      fun += "{" + printActions(el.actions, 0, tab) + "\n} ==> @" + el.toState;
+    else fun += "([X])";
   });
+  return fun;
+}
+export function getCodeHOinput(HOinput) {
+  var tab = "  ";
+  var assets =
+    HOinput.assets.length > 0
+      ? "asset " + HOinput.assets.join(", ") + "\n"
+      : "";
+  var fields =
+    HOinput.fields.length > 0
+      ? "field " + HOinput.fields.join(", ") + "\n"
+      : "";
+  var parties =
+    HOinput.parties.length > 0
+      ? "party " + HOinput.parties.join(", ") + "\n"
+      : "";
+
+  var actions =
+    HOinput.actions.length > 0
+      ? "\n\n{" +
+        printActions(HOinput.actions, 0, tab) +
+        "\n} ==> @" +
+        HOinput.toState +
+        "\n"
+      : "";
+  var fun =
+    HOinput.functions.length > 0
+      ? printFunctions(HOinput.functions) + "\n"
+      : "";
+
+  var code = assets + fields + parties + fun + actions;
+
+  return code;
+}
+export function getCode(contract) {
+  var tab = "  ";
+
+  // AGREEMENT
+  var assets = "asset " + contract.assets.join(", ");
+
+  var fields = "field " + contract.fields.join(", ");
+
+  var agreement = "agreement (" + contract.parties.join(", ");
+  agreement += ")(" + contract.fields.join(", ") + ") {\n" + tab;
+  contract.agreements.map((ag) => {
+    agreement += ag.parties.join(", ") + " : " + ag.fields.join(", ") + "\n";
+  });
+  var fun = printFunctions(contract.functions);
+  agreement += "\n} ==> @" + contract.firstState;
+
+  //FUNCTIONS
 
   var code =
     "stipula " +
@@ -181,22 +192,13 @@ export function getCode(contract) {
     "\n" +
     tab +
     "init " +
-    contract.agreement.state +
+    contract.firstState +
     "\n\n" +
     tab +
     agreement +
     fun +
     "\n}";
   return code;
-}
-function Agreement() {
-  this.state = "";
-  this.authority = "";
-  this.dataSource = "";
-  this.parties = [];
-  this.fieldsAuthority = [];
-  this.fieldsDS = [];
-  this.fieldsParties = [];
 }
 
 export function Function(id) {
@@ -209,6 +211,7 @@ export function Function(id) {
   this.caller = [];
   this.conditions = [{ par1: "", par2: "", par3: "", par4: "" }];
   this.actions = [];
+  this.isHO = false;
 }
 
 export function Action(type, id) {

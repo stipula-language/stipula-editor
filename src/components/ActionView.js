@@ -66,7 +66,7 @@ function AddButton(props) {
     );
   }
   return (
-    <li ref={menuRef}>
+    <li ref={menuRef} className="dropdown-container">
       <div
         className="menu-trigger"
         value="add"
@@ -74,7 +74,19 @@ function AddButton(props) {
           setShow(!show);
         }}
       />
-      <div className={`dropdown ${show ? "active" : "inactive"}`}>
+      <div
+        className={`dropdown ${show ? "active" : "inactive"}`}
+        style={
+          menuRef.current != undefined
+            ? {
+                top:
+                  menuRef.current.getBoundingClientRect().top +
+                  window.scrollY +
+                  15,
+              }
+            : {}
+        }
+      >
         <DropdownItem text="Send x to y" type="SEND1" {...props} />
         <DropdownItem text="Send x (+-×÷) z to y" type="SEND2" {...props} />
         <DropdownItem text="Move x to y" type="MOVE1" {...props} />
@@ -348,7 +360,9 @@ function ActionView(props) {
                               }}
                               value={cond.par4}
                             >
-                              <option value="" selected></option>
+                              <option value="" selected>
+                                Add condition...
+                              </option>
                               <option value="&&">and</option>
                               <option value="||">or</option>
                             </select>

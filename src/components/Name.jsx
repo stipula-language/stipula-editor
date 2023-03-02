@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 function Name(props) {
   const [input, setInpunt] = useState("");
-  function handleChange() {
-    props.handleAdd(input);
-  }
   return (
     <div>
       <label htmlFor="contract-name">Insert the contract name</label>
