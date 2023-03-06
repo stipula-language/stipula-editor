@@ -4,14 +4,14 @@ Stipula Editor is a web application developed with React that provides a graphic
 
 ## Getting Started
 
-To get started with Stipula Editor, you can either download the repository and run it locally or visit the GitHub Pages site at https://eliaventuri.github.io/stipula-editor/.
+To get started with Stipula Editor, you can either download the repository and run it locally or visit the GitHub Pages site at https://stipula-language.github.io/stipula-editor/.
 
 ### Running Locally
 
 1. Clone the repository:
 
 ```
-git clone https://github.com/eliaventuri/stipula-editor.git
+git clone https://github.com/stipula-language/stipula-editor.git
 ```
 
 2. Install the dependencies:
