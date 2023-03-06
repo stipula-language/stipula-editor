@@ -16,14 +16,14 @@ git clone https://github.com/eliaventuri/stipula-editor.git
 
 2. Install the dependencies:
 
+```
 npm install
-
 ```
+
 3. Start the development server:
-```
 
+```
 npm start
+```
 
-```
 4. Open the app in your browser at http://localhost:3000
-```
