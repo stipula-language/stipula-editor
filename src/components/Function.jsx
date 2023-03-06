@@ -101,14 +101,32 @@ function Function(props) {
           <div>
             <label>Higher-order function</label>
             <input
-              type={"checkbox"}
+              type="checkbox"
               onChange={(e) => {
                 props.setFunction({ ...props.fun, isHO: e.target.checked });
               }}
               checked={props.fun.isHO}
             ></input>
           </div>
-
+          {props.fun.isHO ? (
+            <div>
+              <label>Choose your input code</label>
+              <select
+                onChange={(e) => {
+                  props.setFunction({ ...props.fun, HOinput: e.target.value });
+                }}
+                defaultValue=""
+                value={props.fun.HOinput}
+              >
+                <option></option>
+                {props.HOinputs.map((v, i) => {
+                  return <option>input_code_{i + 1}</option>;
+                })}
+              </select>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="grid-from-state list-box">
             <label htmlFor="function-from-state">From state:</label>
             <ul>

@@ -14,6 +14,7 @@ export class Contract {
 }
 export class HOinput {
   constructor() {
+    this.name = "";
     this.assets = [];
     this.fields = [];
     this.toState = "";
@@ -126,7 +127,7 @@ function printFunctions(functions) {
     }
     if (!el.isHO)
       fun += "{" + printActions(el.actions, 0, tab) + "\n} ==> @" + el.toState;
-    else fun += "([X])";
+    else fun += "([ " + el.HOinput + ".stipula ])";
   });
   return fun;
 }
@@ -142,7 +143,7 @@ export function getCodeHOinput(HOinput) {
       : "";
   var parties =
     HOinput.parties.length > 0
-      ? "party " + HOinput.parties.join(", ") + "\n"
+      ? "parties " + HOinput.parties.join(", ") + "\n"
       : "";
 
   var actions =
@@ -158,7 +159,7 @@ export function getCodeHOinput(HOinput) {
       ? printFunctions(HOinput.functions) + "\n"
       : "";
 
-  var code = assets + fields + parties + fun + actions;
+  var code = parties + assets + fields + fun + actions;
 
   return code;
 }
@@ -212,6 +213,7 @@ export function Function(id) {
   this.conditions = [{ par1: "", par2: "", par3: "", par4: "" }];
   this.actions = [];
   this.isHO = false;
+  this.HOinput = "";
 }
 
 export function Action(type, id) {

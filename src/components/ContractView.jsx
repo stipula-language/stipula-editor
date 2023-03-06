@@ -132,6 +132,7 @@ function ContractView(props) {
                   actions={element.actions}
                   fields={cont.fields}
                   assets={cont.assets}
+                  HOinputs={cont.HOinputs}
                   parties={cont.parties.filter((str) => str.trim() !== "")}
                   setFunction={(fun) => {
                     setFunction(fun, index);
@@ -259,7 +260,7 @@ function ContractView(props) {
       getCode(cont)
     );
     cont.HOinputs.map((el, i) => {
-      zip.file("input_code_" + (i + 1) + ".txt", getCodeHOinput(el));
+      zip.file("input_code_" + (i + 1) + ".stipula", getCodeHOinput(el));
     });
     const state = { cont };
     const stateJson = JSON.stringify(state);

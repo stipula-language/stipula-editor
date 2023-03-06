@@ -20,6 +20,7 @@ function HOinputs(props) {
           <div className="hoinput">
             <HOinputView
               HOinput={el}
+              HOinputs={props.HOinputs}
               setHOinput={(input) => {
                 const updatedList = props.HOinputs.slice();
                 updatedList.splice(i, 1, input);
@@ -197,6 +198,7 @@ function HOinputView(props) {
                   fun={element}
                   actions={element.actions}
                   isHO={1}
+                  HOinputs={props.HOinputs}
                   setFunction={(fun) => {
                     setFunction(fun, index);
                   }}
