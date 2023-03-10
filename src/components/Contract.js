@@ -228,6 +228,7 @@ export function Action(type, id) {
   this.ifThen = [];
   this.elseThen = [];
 }
-export function cleanStr(str) {
-  return str.replace(/[^a-zA-Z0-9_]/g, "");
+export function cleanStr(str, exceptions = []) {
+  const regex = new RegExp(`[^a-zA-Z0-9_${exceptions.join("")}]`, "g");
+  return str.replace(regex, "");
 }

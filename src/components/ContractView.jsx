@@ -182,6 +182,7 @@ function ContractView(props) {
         </>
       ) : (
         <HOinputs
+          parties={cont.parties}
           HOinputs={cont.HOinputs}
           setHOinputs={(inputs) => {
             setCont({ ...cont, HOinputs: inputs });

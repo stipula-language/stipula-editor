@@ -45,11 +45,18 @@ function Function(props) {
     setCaller("");
   }
   function handleAddCaller(e) {
-    if (!props.fun.caller.includes(caller))
-      props.setFunction({
-        ...props.fun,
-        caller: [...props.fun.caller, caller],
-      });
+    if (!props.fun.caller.includes(caller)) {
+      if (caller == "~") {
+        props.setFunction({
+          ...props.fun,
+          caller: [caller],
+        });
+      } else
+        props.setFunction({
+          ...props.fun,
+          caller: [...props.fun.caller.filter((item) => item !== "~"), caller],
+        });
+    }
     setCaller("");
     e.preventDefault();
   }
@@ -258,11 +265,12 @@ function Function(props) {
                     type="text"
                     value={caller}
                     onChange={(e) => {
-                      setCaller(cleanStr(e.target.value));
+                      setCaller(cleanStr(e.target.value, ["~"]));
                     }}
                   />
                   <input type="submit" value=" " />
                 </form>
+                <label>Insert "~" to add all parties</label>
               </>
             )}
           </div>

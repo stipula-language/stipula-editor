@@ -199,6 +199,7 @@ function HOinputView(props) {
                   actions={element.actions}
                   isHO={1}
                   HOinputs={props.HOinputs}
+                  parties={props.parties}
                   setFunction={(fun) => {
                     setFunction(fun, index);
                   }}
