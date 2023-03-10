@@ -30,11 +30,18 @@ function Function(props) {
     props.setFunction({ ...props.fun, toState: element });
   }
   function addCaller(element) {
-    if (!props.fun.caller.includes(element))
-      props.setFunction({
-        ...props.fun,
-        caller: [...props.fun.caller, element],
-      });
+    if (!props.fun.caller.includes(element)) {
+      if (element == "~") {
+        props.setFunction({
+          ...props.fun,
+          caller: [element],
+        });
+      } else
+        props.setFunction({
+          ...props.fun,
+          caller: [...props.fun.caller.filter((item) => item !== "~"), element],
+        });
+    }
     setCaller("");
   }
   function handleAddCaller(e) {
@@ -237,6 +244,7 @@ function Function(props) {
                     <option value="" selected disabled hidden>
                       Select...
                     </option>
+                    <option value="~">All the parties</option>
                     {props.parties.map((element) => {
                       return <option value={element}>{element}</option>;
                     })}
