@@ -89,6 +89,7 @@ function ContractView(props) {
               value={cont.fields}
               valueInit={cont.fieldInit}
               deleteField={(field) => deleteField(field)}
+              deleteFieldInit={(field) => deleteFieldInit(field)}
             />
           </div>
           <div className="grid-parties">
@@ -234,6 +235,12 @@ function ContractView(props) {
   function deleteField(element) {
     const updatedList = cont.fields.filter((item) => item !== element);
     setCont({ ...cont, fields: updatedList });
+  }
+  function deleteFieldInit(element) {
+    delete cont.fieldInit[element];
+    setCont({
+      ...cont
+    });
   }
   function addParty(element) {
     if (!cont.parties.includes((element = cleanStr(element))))

@@ -22,16 +22,20 @@ function Fields(props) {
                 {element}
                 <input type="text" style={{width: 50}} value={props.valueInit[element]} onChange={(event) => {
                   let value = event.target.value;
-                  try {
-                    value = parseInt(value);
-                  } catch(error) {
+                  if(value === '') {
+                    props.deleteFieldInit(element);
+                  } else {
                     try {
-                      value = parseFloat(value);
+                      value = parseInt(value);
                     } catch(error) {
+                      try {
+                        value = parseFloat(value);
+                      } catch(error) {
 
+                      }
                     }
+                    props.handleInit(element, value);
                   }
-                  props.handleInit(element, value);
                 }} />
               </li>
             );
