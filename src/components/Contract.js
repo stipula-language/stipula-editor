@@ -5,6 +5,7 @@ export class Contract {
     this.name = "";
     this.assets = [];
     this.fields = [];
+    this.fieldInit = {};
     this.firstState = "";
     this.parties = [];
     this.agreements = [{ parties: [], fields: [] }];
@@ -169,7 +170,9 @@ export function getCode(contract) {
   // AGREEMENT
   var assets = "asset " + contract.assets.join(", ");
 
-  var fields = "field " + contract.fields.join(", ");
+  var fields = "field " + contract.fields.map((e) => {
+    return (e in contract.fieldInit ? `${e} = ${contract.fieldInit[e]}` : e);
+  }).join(", ");
 
   var agreement = "agreement (" + contract.parties.join(", ");
   agreement += ")(" + contract.fields.join(", ") + ") {\n" + tab;

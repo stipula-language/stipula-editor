@@ -85,7 +85,9 @@ function ContractView(props) {
           <div className="grid-fields">
             <Fields
               handleAdd={(field) => addField(field)}
+              handleInit={(field, value) => addFieldInit(field, value)}
               value={cont.fields}
+              valueInit={cont.fieldInit}
               deleteField={(field) => deleteField(field)}
             />
           </div>
@@ -220,6 +222,14 @@ function ContractView(props) {
   function addField(element) {
     if (!cont.fields.includes((element = cleanStr(element))))
       setCont({ ...cont, fields: [...cont.fields, element] });
+  }
+  function addFieldInit(element, value) {
+    if(value !== '') {
+      cont.fieldInit[element] = value;
+      setCont({
+        ...cont
+      });
+    }
   }
   function deleteField(element) {
     const updatedList = cont.fields.filter((item) => item !== element);
