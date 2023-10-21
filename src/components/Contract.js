@@ -9,6 +9,11 @@ export class Contract {
     this.firstState = "";
     this.parties = [];
     this.agreements = [{ parties: [], fields: [] }];
+    this.expiration = {
+      expireTime: '',
+      sourceState: '',
+      destinationState: ''
+    };
     this.functions = [];
     this.HOinputs = [];
   }
@@ -180,6 +185,9 @@ export function getCode(contract) {
     agreement += ag.parties.join(", ") + " : " + ag.fields.join(", ") + "\n";
   });
   var fun = printFunctions(contract.functions);
+  if(contract.expiration.expireTime && contract.expiration.sourceState && contract.expiration.destinationState) {
+    agreement += `  ${contract.expiration.expireTime} >> @${contract.expiration.sourceState} {_} @${contract.expiration.destinationState}`;
+  }
   agreement += "\n} ==> @" + contract.firstState;
 
   //FUNCTIONS

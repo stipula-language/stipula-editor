@@ -3,6 +3,10 @@ import { cleanStr } from "./Contract";
 function Agreement(props) {
   const [empty, setEmpty] = useState("");
 
+  function handleChangeExpiration(key, value) {
+    props.expiration[key] = value;
+    props.setExpiration(props.expiration);
+  }
   function handleChangeState(value) {
     props.setState(value);
   }
@@ -126,6 +130,27 @@ function Agreement(props) {
             ])
           }
         ></button>
+      </div>
+      <div>Expiration</div>
+      <div style={{display: 'flex'}}>
+        <span style={{margin: 'auto'}}>
+          <label>When</label>
+          <input type="text" value={props.expiration.expireTime} onChange={
+            (e) => {handleChangeExpiration('expireTime', e.target.value);
+          }} />
+        </span>
+        <span style={{margin: 'auto'}}>
+          <label>From state</label>
+          <input type="text" value={props.expiration.sourceState} onChange={
+            (e) => {handleChangeExpiration('sourceState', e.target.value);
+          }} />
+        </span>
+        <span style={{margin: 'auto'}}>
+          <label>To state</label>
+          <input type="text" value={props.expiration.destinationState} onChange={(e) => {
+            handleChangeExpiration('destinationState', e.target.value);
+          }} />
+        </span>
       </div>
       <div className="grid-state">
         <label htmlFor="ag-state">State name after the agreement:</label>

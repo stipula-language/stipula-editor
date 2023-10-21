@@ -108,6 +108,13 @@ function ContractView(props) {
               }
               parties={cont.parties}
               fields={cont.fields}
+              expiration={cont.expiration}
+              setExpiration={(element) => {
+                setCont({
+                  ...cont,
+                  expiration: element
+                });
+              }}
               state={cont.firstState}
               setState={(element) => setCont({ ...cont, firstState: element })}
             />
