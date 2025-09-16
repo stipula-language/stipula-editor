@@ -73,7 +73,7 @@ function printActions(ac, i, tab) {
       case "WHEN1":
         act += "now + " + ac[i].par1 + " >> @" + ac[i].par2 + " {";
         act += printActions(ac[i].ifThen, 0, tab + tab).slice(0, -3) + "\n";
-        act += tab + "} ==> @" + ac[i].par3;
+        act += tab + "} => @" + ac[i].par3;
         break;
       case "WHEN2":
         act += ac[i].par1 + " >> @" + ac[i].par2 + " {";
@@ -82,12 +82,12 @@ function printActions(ac, i, tab) {
           (ac[i].elseThen.length > 0
             ? tab + "else {\n" + printActions(ac[i].elseThen, 0, tab + tab)
             : "");
-        act += tab + "} ==> @" + ac[i].par3;
+        act += tab + "} => @" + ac[i].par3;
         break;
     }
     if (i == ac.length - 1 && ac[i].type != "WHEN1" && ac[i].type != "WHEN2") {
       act = "\n" + act;
-      act += ";\n_";
+    //  act += ";\n_";
     } else if (i == ac.length - 1) {
       act = ";\n" + act;
     } else {
@@ -100,8 +100,8 @@ function printFunctions(functions) {
   var tab = "  ";
   var fun = "";
   functions.map((el) => {
-    fun +=
-      "\n\n@" +
+    fun += 
+      "\n\n" + tab + "@" +
       el.fromState.join("@") +
       " " +
       el.caller +
@@ -126,7 +126,7 @@ function printFunctions(functions) {
       fun += ")";
     }
     if (!el.isHO)
-      fun += "{" + printActions(el.actions, 0, tab) + "\n} ==> @" + el.toState;
+      fun += "{" + printActions(el.actions, 0, tab + tab) + "\n" + tab + "} => @" + el.toState;
     else fun += "([ " + el.HOinput + ".stipula ])";
   });
   return fun;
@@ -135,7 +135,7 @@ export function getCodeHOinput(HOinput) {
   var tab = "  ";
   var assets =
     HOinput.assets.length > 0
-      ? "asset " + HOinput.assets.join(", ") + "\n"
+      ? "assets " + HOinput.assets.join(", ") + "\n"
       : "";
   var fields =
     HOinput.fields.length > 0
@@ -149,8 +149,8 @@ export function getCodeHOinput(HOinput) {
   var actions =
     HOinput.actions.length > 0
       ? "\n\n{" +
-        printActions(HOinput.actions, 0, tab) +
-        "\n} ==> @" +
+        printActions(HOinput.actions, 0, tab ) +
+        "\n} => @" +
         HOinput.toState +
         "\n"
       : "";
@@ -167,17 +167,17 @@ export function getCode(contract) {
   var tab = "  ";
 
   // AGREEMENT
-  var assets = "asset " + contract.assets.join(", ");
+  var assets = "assets " + contract.assets.join(", ");
 
-  var fields = "field " + contract.fields.join(", ");
+  var fields = "fields " + contract.fields.join(", ");
 
   var agreement = "agreement (" + contract.parties.join(", ");
-  agreement += ")(" + contract.fields.join(", ") + ") {\n" + tab;
+  agreement += ")(" + contract.fields.join(", ") + ") {\n" ;
   contract.agreements.map((ag) => {
-    agreement += ag.parties.join(", ") + " : " + ag.fields.join(", ") + "\n";
+    agreement += tab + tab + ag.parties.join(", ") + " : " + ag.fields.join(", ") + "\n";
   });
   var fun = printFunctions(contract.functions);
-  agreement += "\n} ==> @" + contract.firstState;
+  agreement +=  tab + "} => @" + contract.firstState;
 
   //FUNCTIONS
 
@@ -191,10 +191,6 @@ export function getCode(contract) {
     tab +
     fields +
     "\n" +
-    tab +
-    "init " +
-    contract.firstState +
-    "\n\n" +
     tab +
     agreement +
     fun +
