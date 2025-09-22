@@ -58,21 +58,21 @@ function printActions(ac, i, tab) {
         });
         act += ") {";
         act +=
-          printActions(ac[i].ifThen, 0, tab + tab).slice(0, -3) +
+          printActions(ac[i].ifThen, 0, tab + tab) +
           "\n" +
-          tab +
-          "_\n" +
+          tab + "\n" +
+         // "_\n" +
           (ac[i].elseThen.length > 0
             ? tab +
-              "else {" +
-              printActions(ac[i].elseThen, 0, tab + tab).slice(0, -3)
+              "} else {" +
+              printActions(ac[i].elseThen, 0, tab + tab)
             : "");
         act += "\n" + tab + "}";
         break;
 
       case "WHEN1":
         act += "now + " + ac[i].par1 + " >> @" + ac[i].par2 + " {";
-        act += printActions(ac[i].ifThen, 0, tab + tab).slice(0, -3) + "\n";
+        act += printActions(ac[i].ifThen, 0, tab + tab) + "\n";
         act += tab + "} => @" + ac[i].par3;
         break;
       case "WHEN2":
