@@ -1,6 +1,6 @@
 # Stipula Editor
 
-Stipula Editor is a web application developed with React that provides a graphical user interface for writing legal contracts in Stipula, a programming language designed for legal contracts.
+Stipula Editor is a web application developed with React that provides a graphical user interface for writing legal contracts in Stipula, a programming language designed for legal contracts. The code has been developed by Elia Venturi in his Undergraduate Thesis.
 
 ## Getting Started
 
